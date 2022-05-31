@@ -3,6 +3,7 @@ import { useState, useContext } from 'react'
 import { MainContext } from '../context'
 import BigNumber from 'bignumber.js'
 import Image from 'next/image';
+import { ethers } from 'ethers';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState();
@@ -41,14 +42,14 @@ export default function Home() {
 
   const fundWallet = async () => {
     if (!amount) return;
-    const parseAmount = parseInput(amount);
-    let response = await bundlrInst.fund(parseAmount);
+    const parseAmount = ethers.utils.parseEther(amount);
+    let response = await bundlrInst.fund(parseAmount.toString());
     console.log('wallet funded: ', response);
     getBalance();
   }
 
   const parseInput = (input) => {
-    const conversion = new BigNumber(input).multipliedBy(bundlrInst.currencyConfig.base[1]);
+    const conversion = new BigNumber(ethers.utils.parseEther(input)).multipliedBy(bundlrInst.currencyConfig.base[1]);
     if (conversion.isLessThan(1)) {
       console.log('error: value too small');
       return;
